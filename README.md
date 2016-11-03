@@ -1,9 +1,9 @@
 # Implementation of Parser for DOT language using JavaCC
 -Involves building a lexer, parser and abstract syntax trees(AST).
 -Three types of visitors have been implemented using the Visitor Design Pattern
---*PrintVisitor*, which prints the AST by depth-first traversal of the tree
---*EdgeVisitor*, which discovers the edge relationships and new nodes from the AST and stores them in ArrayLists.
---*OptimizerVisitor*, which removes the redundant edges from the AST whenever possible.
+1)**PrintVisitor**, which prints the AST by depth-first traversal of the tree
+2)**EdgeVisitor**, which discovers the edge relationships and new nodes from the AST and stores them in ArrayLists.
+3)**OptimizerVisitor**, which removes the redundant edges from the AST whenever possible.
 
 ##Usage
 Run the Makefile as follows to obtain all the .class files
