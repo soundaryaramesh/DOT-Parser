@@ -6,6 +6,7 @@ Three types of visitors have been implemented using the Visitor Design Pattern <
 **OptimizerVisitor**, which removes the redundant edges from the AST whenever possible.
 
 ##Usage
+Install javacc and add it to the PATH variable <br />
 Run the Makefile as follows to obtain all the .class files
 ### make
 Run the following command to obtain the parser
