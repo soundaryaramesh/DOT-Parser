@@ -1,0 +1,149 @@
+options{
+LOOKAHEAD=1;
+MULTI=true;
+//changes
+VISITOR=true;
+NODE_DEFAULT_VOID=true;
+}
+PARSER_BEGIN(DotParser)
+
+class DotParser{
+	public static void main(String args[]) throws ParseException, TokenMgrError{
+		System.out.println("Reading from standard input");
+		DotParser parser=new DotParser(System.in);
+		try{
+			ASTStart n=parser.Start(); //this is necessary for the creation of the Abstract Syntax tree
+			DotParserVisitor e=new DotParserEdgeVisitor();
+			Graph g=(Graph)n.jjtAccept(e,null);
+			System.out.println("\nAbstract Syntax Tree before optimisation\n");
+			DotParserVisitor p=new DotParserPrintVisitor();
+			n.jjtAccept(p,null); 
+			
+			
+			
+			DotParserVisitor a=new DotParserOptimizerVisitor();
+			n.jjtAccept(a,g);
+			System.out.println("\nAbstract Syntax Tree after optimisation\n");
+			DotParserVisitor v=new DotParserPrintVisitor();
+			n.jjtAccept(v,null); 
+		}
+		catch(Exception e){
+			System.out.println("Something went wrong. Printing the stack trace..");
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+	}
+}
+PARSER_END(DotParser)
+
+TOKEN_MGR_DECLS:
+{
+	static int linenumber=0;
+    static int commentNesting=0;
+}
+SKIP: /*White spaces*/
+{
+	"\t"
+| 	"\n"	{linenumber++;}
+|	"\r"
+|	"\r\n"
+|	" "
+}
+
+SKIP: /*comments*/
+{
+    "/*"  {commentNesting++;}: MULTI_COMMENT
+}
+<MULTI_COMMENT> SKIP:
+{
+    "*/" {	commentNesting--;
+            if(commentNesting==0){
+                SwitchTo(DEFAULT);
+             }
+         }
+|  "/*" {
+			commentNesting++;
+		}
+| <~[]>	
+
+}
+SKIP: 
+{
+	"//" : LINE_COMMENT
+}
+<LINE_COMMENT> SKIP:
+{
+	"\n" {SwitchTo(DEFAULT);}
+| <~[]>
+
+}
+TOKEN : 
+{ 
+	< GRAPH : ("g"|"G")("r"|"R")("a"|"A")("p"|"P")("h"|"H") > 
+|	< DIGRAPH : ("d"|"D")("i"|"I")("g"|"G")("r"|"R")("a"|"A")("p"|"P")("h"|"H") > 	
+|	< OPEN_BRACES : "{" > 
+|	< CLOSE_BRACES : "}" > 
+|	< SEMI_COLON : ";" > 
+|	< #LETTER : ["a"-"z","A"-"Z","_"] > 
+|	< #DIGIT : ["0"-"9"] > 
+|	< ID : <LETTER> ( <LETTER> | <DIGIT> )* > 
+|	< GR_OP : ["-"]["-"] > 
+|	< DGR_OP : ["-"][">"] > 
+}
+ASTStart Start() #Start:
+{}
+{
+	( (<GRAPH> [ graph_id() ] <OPEN_BRACES> graph_stmt_list() <CLOSE_BRACES>) #graph 
+	| ( <DIGRAPH> [ graph_id() ] <OPEN_BRACES> digraph_stmt_list() <CLOSE_BRACES> ) #digraph )
+	{return jjtThis;}
+}
+
+void graph_id() #graph_id :
+{
+	Token t;
+}
+{
+	t=<ID>
+	{jjtThis.setName(t.image);}
+}
+
+void node_id() #node_id :
+{
+	Token t;
+}
+{
+	t=<ID>
+	{jjtThis.setName(t.image);}
+}
+
+void graph_stmt_list() :
+{}
+{
+	( g_edge_stmt() [ <SEMI_COLON> ] )*
+}
+
+void g_edge_stmt() :
+{}
+{
+	(node_id() ( <GR_OP> node_id() )* 
+	)#undirectedEdge(>1) //only if the number of nodes under the current node scope is greater than 1, a new node will be generated. given by jjtree.arity()
+}
+
+void digraph_stmt_list() :
+{}
+{
+	( dg_edge_stmt() [ <SEMI_COLON> ] )*
+}
+
+void dg_edge_stmt() :
+{}
+{
+	(node_id() ( <DGR_OP> node_id() )*
+	)#directedEdge(>1)
+}
+
+
+
+
+
+

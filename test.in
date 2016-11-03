@@ -1,0 +1,5 @@
+graph graph_name{
+a--b--c;
+b--c--d;
+c--d;
+}
