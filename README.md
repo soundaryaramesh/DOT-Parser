@@ -5,7 +5,7 @@ Three types of visitors have been implemented using the Visitor Design Pattern <
 **EdgeVisitor**, which discovers the edge relationships and new nodes from the AST and stores them in ArrayLists. <br />
 **OptimizerVisitor**, which removes the redundant edges from the AST whenever possible.
 
-##Usage
+## Usage
 Install javacc and add it to the PATH variable <br />
 Run the Makefile as follows to obtain all the .class files
 ### make
@@ -15,7 +15,7 @@ To remove all the additional files created during the process
 ### make clean
 
 
-##Tests
+## Tests
 A sample DOT language graph is present in the file *test.in*
 ### java DotParser \< test.in 
 
